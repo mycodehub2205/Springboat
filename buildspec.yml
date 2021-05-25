@@ -6,19 +6,19 @@ phases:
       - echo Logging in to Amazon ECR...
       - aws --version
       - $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
-      - REPOSITORY_URI=518229699147.dkr.ecr.us-east-1.amazonaws.com/poc-ms  #Completar con uri de ecr repo (output de tf en tf-base-repos)
+      - REPOSITORY_URI=778919969432.dkr.ecr.us-east-2.amazonaws.com/linuxdemoecr  #Completar con uri de ecr repo (output de tf en tf-base-repos)
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - IMAGE_TAG=${COMMIT_HASH:=latest}
   build:
     commands:
       - echo Build started on `date`
       - echo Building the Docker image...
-      #- docker build -t $REPOSITORY_URI:latest .                     # se reemplaza por build de jib
-      - mvn compile jib:build -Dimage=$REPOSITORY_URI:latest          # TODO: Probar multiple tags utilizando el to.tags en los parámetros (https://docs.aws.amazon.com/codebuild/latest/userguide/build-env-ref-available.html)
-      #- docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
+      - docker build -t $REPOSITORY_URI:latest .                     # se reemplaza por build de jib
+      #- mvn compile jib:build -Dimage=$REPOSITORY_URI:latest          # TODO: Probar multiple tags utilizando el to.tags en los parámetros (https://docs.aws.amazon.com/codebuild/latest/userguide/build-env-ref-available.html)
+      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
   post_build:
     commands:
       - echo Build completed on `date`
-      #- echo Pushing the Docker images...                            # el jib build realiza el push también
-      #- docker push $REPOSITORY_URI:latest
-      #- docker push $REPOSITORY_URI:$IMAGE_TAG
+      -echo Pushing the Docker images...                            # el jib build realiza el push también
+      - docker push $REPOSITORY_URI:latest
+      - docker push $REPOSITORY_URI:$IMAGE_TAG
